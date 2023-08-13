@@ -16,6 +16,7 @@ void init_chat_rooms()
     {
         chat_rooms[room_num].num_of_clients = 0;
         pthread_mutex_init(&(chat_rooms[room_num].lock), NULL);
+        pthread_mutex_lock(&(chat_rooms[room_num].lock));
     }
 }
 
@@ -53,14 +54,10 @@ void get_rooms_list(client_t *client, uint8_t *rooms_list)
 {
     uint8_t room_num;
 
-    *(rooms_list++) = LIST_ROOMS_RESPONSE;
-    *(rooms_list++) = NUM_OF_ROOMS;
-    pthread_mutex_lock(&(chat_rooms[client->room_id].lock));
     for (room_num = 0; room_num < NUM_OF_ROOMS; room_num++)
     {
-        *(rooms_list++) = chat_rooms[room_num].num_of_clients;
+        rooms_list[room_num] = chat_rooms[room_num].num_of_clients;
     }
-    pthread_mutex_unlock(&(chat_rooms[client->room_id].lock));
 }
 
 void send_message_to_room(uint8_t room_id, char *msg, int len)

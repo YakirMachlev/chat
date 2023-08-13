@@ -18,7 +18,7 @@ void client_ui_first_hierarchy(int sockfd)
 {
     int option;
     printf("choose 1 - registration / 2 - login\n> ");
-    scanf("%d", &option);
+    scanf("  %d", &option);
 
     if (option == 1)
     {
@@ -41,9 +41,11 @@ void client_ui_second_hierarchy(int sockfd)
 {
     int room_num;
 
+    puts("a");
     client_requests_list_rooms(sockfd);
+    puts("b");
     pthread_cond_wait(&condition, &lock);
-
+    puts("c");
     room_num = -1;
     while (room_num < 1 || room_num > 5)
     {
@@ -81,9 +83,10 @@ void client_ui_third_hierarchy(int sockfd)
 
 void client_ui_register_response(char *buffer)
 {
-    uint8_t result;
+    int8_t result;
 
     result = *(buffer++);
+    printf("%d\n", result);
     if (!*buffer)
     {
         if (result == 0)
@@ -105,7 +108,7 @@ void client_ui_register_response(char *buffer)
 
 void client_ui_login_response(char *buffer)
 {
-    uint8_t result;
+    int8_t result;
 
     result = *buffer;
     if (result == 0 && !*buffer)
@@ -128,7 +131,7 @@ void client_ui_login_response(char *buffer)
 
 void client_ui_list_rooms_response(char *buffer)
 {
-    uint8_t result;
+    int8_t result;
     uint8_t offset;
 
     result = *buffer;
@@ -142,13 +145,12 @@ void client_ui_list_rooms_response(char *buffer)
         {
             printf("room #%d: %d\n", offset, *(++buffer));
         }
-        pthread_cond_signal(&condition);
     }
 }
 
 void client_ui_join_room_response(char *buffer)
 {
-    uint8_t result;
+    int8_t result;
 
     result = *buffer;
     if (result == 0 && !*buffer)
@@ -191,7 +193,7 @@ void client_ui_send_message_in_room_response(char *buffer)
 
 void client_ui_exit_room_response(char *buffer)
 {
-    uint8_t result;
+    int8_t result;
 
     result = *buffer;
     if (result == 0 && !*buffer)

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include "server_conf.h"
 

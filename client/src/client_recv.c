@@ -15,6 +15,7 @@ static void handle_recv_from_server(char *buffer, int length)
         client_ui_login_response(buffer);
         break;
     case LIST_ROOMS_RESPONSE:
+        pthread_cond_signal(&condition);
         client_ui_list_rooms_response(buffer);
         break;
     case JOIN_ROOM_RESPONSE:

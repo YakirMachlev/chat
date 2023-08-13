@@ -14,14 +14,17 @@ extern int connected_clients;
 
 #define CLIENT_DISCONNECT                                  \
     printf("Client %d disconnected\n", connected_clients); \
-    client_exit_room(client);                              \
+    if (client->room_id != -1)                             \
+    {                                                      \
+        client_exit_room(client);                          \
+    }                                                      \
     close(client->sockfd);                                 \
     free(client);                                          \
     connected_clients--;                                   \
     pthread_exit(NULL);
 
 #define ASSERT(expression) \
-    if (!(expression))        \
+    if (!(expression))     \
     {                      \
         CLIENT_DISCONNECT  \
     }
