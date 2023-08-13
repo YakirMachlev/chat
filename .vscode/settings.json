@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "types.h": "c",
+        "stdio.h": "c",
+        "server_functions.h": "c",
+        "netdb.h": "c",
+        "socket.h": "c",
+        "inet.h": "c",
+        "in.h": "c",
+        "server_rooms.h": "c",
+        "inttypes.h": "c",
+        "stdbool.h": "c",
+        "clients_file.h": "c",
+        "stdlib.h": "c",
+        "rooms.h": "c",
+        "client_recv.h": "c",
+        "client_ui.h": "c",
+        "server_client.h": "c",
+        "server_client_functions.h": "c",
+        "client_requests.h": "c",
+        "client_conf.h": "c"
+    }
+}
