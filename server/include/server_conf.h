@@ -5,8 +5,8 @@
 #define PORT "1234"
 #define NUM_OF_CONNECTIONS 50
 #define SERVER_FULL_MSG "Current server full"
-#define NAME_MAX_LENGTH 12
-#define PASSWORD_MAX_LENGTH 32
+#define NAME_MAX_LENGTH 13
+#define PASSWORD_MAX_LENGTH 33
 #define DATA_MAX_LENGTH 1 << (sizeof(uint16_t) * 8)
 #define ERROR_LENGTH 2
 
@@ -21,7 +21,7 @@ extern int connected_clients;
     pthread_exit(NULL);
 
 #define ASSERT(expression) \
-    if (expression)        \
+    if (!(expression))        \
     {                      \
         CLIENT_DISCONNECT  \
     }

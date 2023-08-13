@@ -27,7 +27,8 @@ void *server_client_handle_functions(void *arg)
             {
                 perror("recv");
             }
-            ASSERT(1)
+            puts("ok");
+            ASSERT(0)
         }
         else
         {
@@ -35,6 +36,7 @@ void *server_client_handle_functions(void *arg)
             buffer[bytes_received] = '\0';
             opcode = *(buffer_ptr++);
 
+            printf("opcode: %d\n", opcode);
             switch (opcode)
             {
             case REGISTER_REQUEST:
@@ -56,7 +58,7 @@ void *server_client_handle_functions(void *arg)
                 client_exit_room(client);
                 break;
             default:
-                ASSERT(1)
+                ASSERT(0)
             }
         }
     }

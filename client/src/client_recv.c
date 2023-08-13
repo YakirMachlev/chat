@@ -3,10 +3,9 @@
 static void handle_recv_from_server(char *buffer, int length)
 {
     response_e response;
-
-    printf("response: %s", buffer);
     
-    response = *(buffer++);
+    response = (uint8_t)*(buffer++);
+    printf("response: %d\n", response);
     switch (response)
     {
     case REGISTER_RESPONSE:
@@ -58,6 +57,7 @@ void *receive_data_from_server(void *arg)
                 perror("recv");
             }
             close(sockfd);
+            exit(1);
             break;
         }
         buffer[bytes_received] = '\0';

@@ -13,19 +13,21 @@ void client_register(client_t *client, uint8_t *buffer)
     uint8_t password_length;
 
     name_length = *(buffer++);
-    ASSERT(name_length <= NAME_MAX_LENGTH && name_length > 0)
+    ASSERT(name_length < NAME_MAX_LENGTH && name_length > 0)
     strncpy(client->name, (char *)buffer, name_length);
     ASSERT(check_name_validity(client->name))
 
     buffer += name_length;
     password_length = *(buffer++);
-    ASSERT(password_length <= PASSWORD_MAX_LENGTH && password_length > 0)
+    ASSERT(password_length < PASSWORD_MAX_LENGTH && password_length > 0)
     password = (char *)buffer;
     password[password_length] = '\0';
 
     if (client->state == EXISTS && !client_file_does_client_exist(client->name))
     {
+        puts("hello");
         insert_client_to_file(client->name, password);
+        printf("%s registered\n", client->name);
         SEND_RESULT(client, error, REGISTER_RESPONSE, 0);
     }
     else
@@ -43,12 +45,12 @@ void client_login(client_t *client, uint8_t *buffer)
     uint8_t password_length;
 
     name_length = *(buffer++);
-    ASSERT(name_length <= NAME_MAX_LENGTH && name_length > 0)
+    ASSERT(name_length < NAME_MAX_LENGTH && name_length > 0)
     name = (char *)buffer;
 
     buffer += name_length;
     password_length = *(buffer++);
-    ASSERT(password_length <= PASSWORD_MAX_LENGTH && password_length > 0)
+    ASSERT(password_length < PASSWORD_MAX_LENGTH && password_length > 0)
     password = (char *)buffer;
 
     name[name_length] = '\0';
@@ -91,7 +93,7 @@ void client_join_room(client_t *client, uint8_t *buffer)
     uint8_t connection_msg_len;
 
     name_length = *(buffer++);
-    ASSERT(name_length <= NAME_MAX_LENGTH && name_length > 0)
+    ASSERT(name_length < NAME_MAX_LENGTH && name_length > 0)
     buffer += name_length;
     room_num = *buffer;
     ASSERT(room_num <= 5 && room_num >= 1)

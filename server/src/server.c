@@ -81,7 +81,7 @@ int main()
     int rv;
     struct addrinfo hints;
     struct addrinfo *servinfo;
-    pthread_t server_thread;
+    pthread_t accept_thread;
 
     init_chat_rooms();
     connected_clients = 0;
@@ -106,8 +106,8 @@ int main()
 
     puts("Waiting for connections");
 
-    pthread_create(&server_thread, NULL, handle_clients, (void *)&server_sockfd);
-    pthread_join(server_thread, NULL);
+    pthread_create(&accept_thread, NULL, handle_clients, (void *)&server_sockfd);
+    pthread_join(accept_thread, NULL);
     
     return 0;
 }

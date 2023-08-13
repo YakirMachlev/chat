@@ -10,33 +10,12 @@
 #define CLIENT_DATA_LENGTH NAME_MAX_LENGTH + PASSWORD_MAX_LENGTH + 3
 #define CLEAR_DATA_MAX_LENGTH DATA_MAX_LENGTH - NAME_MAX_LENGTH - 3
 
-#define CLIENT_DISCONNECT     \
-    client_exit_room(client); \
-    close(client->sockfd);    \
-    free(client);             \
-    pthread_exit(NULL);
-
-#define ASSERT(expression) \
-    if (expression)        \
-    {                      \
-        CLIENT_DISCONNECT  \
-    }
-
-typedef enum
-{
-    NONE,
-    EXISTS,
-    CONNECTED,
-    JOINED
-} state_e;
-
-typedef struct 
+typedef struct
 {
     int sockfd;
     char name[NAME_MAX_LENGTH];
     uint8_t name_length;
     uint8_t room_id;
-    state_e state;
 } client_t;
 
 extern client_t client;

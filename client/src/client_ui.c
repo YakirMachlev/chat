@@ -9,7 +9,6 @@ void *client_ui_start(void *arg)
 
     sockfd = *(int *)arg;
     client.sockfd = sockfd;
-    client.state = NONE;
     client_ui_first_hierarchy(sockfd);
 
     return NULL;
@@ -85,7 +84,6 @@ void client_ui_register_response(char *buffer)
     uint8_t result;
 
     result = *(buffer++);
-    client.state = EXISTS;
     if (!*buffer)
     {
         if (result == 0)
@@ -102,7 +100,6 @@ void client_ui_register_response(char *buffer)
     else
     {
         puts("Invalid response");
-        client.state = NONE;
     }
 }
 
@@ -114,7 +111,6 @@ void client_ui_login_response(char *buffer)
     if (result == 0 && !*buffer)
     {
         puts("Login succeded");
-        client.state = CONNECTED;
         pthread_cond_signal(&condition);
         client_ui_second_hierarchy(client.sockfd);
     }
@@ -158,8 +154,8 @@ void client_ui_join_room_response(char *buffer)
     if (result == 0 && !*buffer)
     {
         puts("Join succeded");
-        client.state = JOINED;
 
+        pthread_cond_signal(&condition);
         client_ui_third_hierarchy(client.sockfd);
     }
     else if (result == -1 && !*buffer)
@@ -201,7 +197,6 @@ void client_ui_exit_room_response(char *buffer)
     if (result == 0 && !*buffer)
     {
         puts("Exit room succeded");
-        client.state = CONNECTED;
         client_ui_second_hierarchy(client.sockfd);
     }
     else if (result == -1 && !*buffer)

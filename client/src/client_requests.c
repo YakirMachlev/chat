@@ -1,8 +1,6 @@
 #include "client_requests.h"
 
 client_t client;
-pthread_cond_t condition;
-pthread_mutex_t lock;
 
 static bool client_requests_check_name_validity(char *name)
 {
@@ -50,7 +48,7 @@ static void client_requests_start(int sockfd, request_e request)
     scanf("%s", password);
     password_length = strlen(password);
 
-    total_length = sprintf(buffer, "%d%d%s%d%s", request, client.name_length, client.name, password_length, password);
+    total_length = sprintf(buffer, "%c%c%s%c%s", request, client.name_length, client.name, password_length, password);
     send(sockfd, buffer, total_length, 0);
 }
 
@@ -78,7 +76,7 @@ void client_requests_join_room(int sockfd)
     char request;
     
     request = JOIN_ROOM_REQUEST;
-    total_length = sprintf(buffer, "%d%d%s%d", request, client.name_length, client.name, client.room_id);
+    total_length = sprintf(buffer, "%c%c%s%c", request, client.name_length, client.name, client.room_id);
     send(sockfd, buffer, total_length, 0);
 }
 
@@ -87,6 +85,6 @@ void client_requests_send_message_in_room(int sockfd, char *msg, uint16_t msg_le
     char buffer[DATA_MAX_LENGTH];
     uint16_t total_length;
 
-    total_length = sprintf(buffer, "%d%d%s%d%s", SEND_MESSAGE_IN_ROOM_REQUEST, client.name_length, client.name, msg_length, msg);
+    total_length = sprintf(buffer, "%c%c%s%hd%s", SEND_MESSAGE_IN_ROOM_REQUEST, client.name_length, client.name, msg_length, msg);
     send(sockfd, buffer, total_length, 0);
 }
