@@ -19,8 +19,9 @@ typedef struct
 } client_t;
 
 extern client_t client;
-extern pthread_cond_t condition;
+extern pthread_cond_t cond;
 extern pthread_mutex_t lock;
+extern bool is_received;
 
 typedef enum
 {

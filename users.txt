@@ -2,3 +2,4 @@ yakir,machlev
 ya,s
 hel,a
 a,s
+s,s
