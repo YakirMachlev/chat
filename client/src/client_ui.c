@@ -15,9 +15,9 @@ void *client_ui_start(void *arg)
 
     pthread_mutex_lock(&lock);
     while (!is_received)
-        pthread_cond_wait(&cond, &mutex);
+        pthread_cond_wait(&cond, &lock);
     /* do something that requires holding the mutex and condition is true */
-    pthread_mutex_unlock(&mutex);
+    pthread_mutex_unlock(&lock);
 
     client_ui_first_hierarchy(sockfd);
 
@@ -33,12 +33,10 @@ void client_ui_first_hierarchy(int sockfd)
     if (option == 1)
     {
         client_requests_register(sockfd);
-        pthread_cond_wait(&cond, &lock);
     }
     else if (option == 2)
     {
         client_requests_login(sockfd);
-        pthread_cond_wait(&cond, &lock);
     }
     else
     {
@@ -95,6 +93,10 @@ void client_ui_register_response(char *buffer)
 {
     int8_t result;
 
+    pthread_mutex_lock(&lock);
+    /* do something that might make condition true */
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&lock);
     result = *(buffer++);
     printf("%d\n", result);
     if (!*buffer)
