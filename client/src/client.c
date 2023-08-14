@@ -7,6 +7,11 @@
 #include "client_ui.h"
 #include "client_recv.h"
 
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+bool is_received = false;
+uint8_t hierarchy;
+
 int client_find_server_valid_address(struct addrinfo *servinfo)
 {
     int sockfd;

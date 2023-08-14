@@ -36,7 +36,7 @@ void *server_client_handle_functions(void *arg)
             buffer[bytes_received] = '\0';
             opcode = *(buffer_ptr++);
 
-            printf("opcode: %d\n", opcode);
+            printf("request: %d\n", opcode);
             switch (opcode)
             {
             case REGISTER_REQUEST:

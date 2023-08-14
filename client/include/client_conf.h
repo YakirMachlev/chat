@@ -20,8 +20,9 @@ typedef struct
 
 extern client_t client;
 extern pthread_cond_t cond;
-extern pthread_mutex_t lock;
+extern pthread_mutex_t mutex;
 extern bool is_received;
+extern uint8_t hierarchy;
 
 typedef enum
 {

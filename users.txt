@@ -3,3 +3,6 @@ ya,s
 hel,a
 a,s
 s,s
+yu,c
+js,s
+kd,s

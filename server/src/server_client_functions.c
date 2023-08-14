@@ -1,8 +1,8 @@
 #include "server_client_functions.h"
 
 #define SEND_RESULT(client, error, opcode, result) \
-    error[0] = opcode;                       \
-    error[1] = result;                           \
+    error[0] = opcode;                             \
+    error[1] = result;                             \
     send(client->sockfd, error, ERROR_LENGTH, 0);
 
 void client_register(client_t *client, uint8_t *buffer)
@@ -28,10 +28,12 @@ void client_register(client_t *client, uint8_t *buffer)
         insert_client_to_file(client->name, password);
         printf("%s registered\n", client->name);
         SEND_RESULT(client, error, REGISTER_RESPONSE, 0);
+        printf("sent: %d,%d\n", REGISTER_RESPONSE, 0);
     }
     else
     {
         SEND_RESULT(client, error, REGISTER_RESPONSE, -1);
+        printf("sent: %d,%d\n", REGISTER_RESPONSE, -1);
     }
 }
 
@@ -60,10 +62,12 @@ void client_login(client_t *client, uint8_t *buffer)
     {
         client->state = CONNECTED;
         SEND_RESULT(client, error, LOGIN_RESPONSE, 0);
+        printf("sent: %d,%d", LOGIN_RESPONSE, 0);
     }
     else
     {
         SEND_RESULT(client, error, LOGIN_RESPONSE, -1);
+        printf("sent: %d,%d", LOGIN_RESPONSE, -1);
     }
 }
 
@@ -78,10 +82,12 @@ void client_list_rooms(client_t *client)
     {
         get_rooms_list(client, rooms_list + 2);
         send(client->sockfd, rooms_list, sizeof(rooms_list) / sizeof(uint8_t), 0);
+        printf("sent: %d,%d,%s", rooms_list[0], rooms_list[1], rooms_list + 2);
     }
     else
     {
         SEND_RESULT(client, error, LIST_ROOMS_RESPONSE, -1);
+        printf("sent: %d,%d", LIST_ROOMS_RESPONSE, -1);
     }
 }
 
@@ -99,7 +105,7 @@ void client_join_room(client_t *client, uint8_t *buffer)
     room_num = *buffer;
     ASSERT(room_num <= 5 && room_num >= 1)
     room_num--; /* assuming that the client isn't aware that arrays start at 0 */
-    
+
     if (client->state == CONNECTED)
     {
         connection_msg_len = sprintf(connection_msg, "%s connected.", client->name);
@@ -108,10 +114,12 @@ void client_join_room(client_t *client, uint8_t *buffer)
         client->state = JOINED;
         client->room_id = room_num;
         SEND_RESULT(client, error, JOIN_ROOM_RESPONSE, 0);
+        printf("sent: %d,%d", JOIN_ROOM_RESPONSE, -1);
     }
     else
     {
         SEND_RESULT(client, error, JOIN_ROOM_RESPONSE, -1);
+        printf("sent: %d,%d", JOIN_ROOM_RESPONSE, -1);
     }
 }
 
@@ -122,6 +130,7 @@ void client_send_massage_in_room(client_t *client, uint8_t *buffer, int length)
     {
         send_message_to_room(client->room_id, (char *)buffer, length);
     }
+    printf("sent: %d,%s", *buffer, buffer + 1);
 }
 
 void client_exit_room(client_t *client)
@@ -137,9 +146,11 @@ void client_exit_room(client_t *client)
         client->state = CONNECTED;
         client->room_id = -1;
         SEND_RESULT(client, error, EXIT_ROOM_RESPONSE, 0);
+        printf("sent: %d,%d", EXIT_ROOM_RESPONSE, 0);
     }
     else
     {
         SEND_RESULT(client, error, EXIT_ROOM_RESPONSE, -1);
+        printf("sent: %d,%d", EXIT_ROOM_RESPONSE, -1);
     }
 }

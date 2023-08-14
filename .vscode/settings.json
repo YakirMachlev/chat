@@ -18,6 +18,7 @@
         "server_client.h": "c",
         "server_client_functions.h": "c",
         "client_requests.h": "c",
-        "client_conf.h": "c"
+        "client_conf.h": "c",
+        "client_responses.h": "c"
     }
 }

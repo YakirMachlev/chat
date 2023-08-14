@@ -88,3 +88,12 @@ void client_requests_send_message_in_room(int sockfd, char *msg, uint16_t msg_le
     total_length = sprintf(buffer, "%c%c%s%hd%s", SEND_MESSAGE_IN_ROOM_REQUEST, client.name_length, client.name, msg_length, msg);
     send(sockfd, buffer, total_length, 0);
 }
+
+void client_requests_exit_room(int sockfd)
+{
+    char buffer[NAME_MAX_LENGTH + 2];
+    uint8_t total_length;
+
+    total_length = sprintf(buffer, "%c%c%s", EXIT_ROOM_REQUEST, client.name_length, client.name);
+    send(sockfd, buffer, total_length, 0);
+}
