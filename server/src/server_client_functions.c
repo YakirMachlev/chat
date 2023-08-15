@@ -160,7 +160,7 @@ void client_exit_room(client_t *client)
         client->state = CONNECTED;
         client->room_id = -1;
 
-        response =  SEND_SERVER_MESSAGE_IN_ROOM;
+        response = SEND_SERVER_MESSAGE_IN_ROOM;
         disconnection_msg_length = strlen(client->name) + 14;
         total_length = sprintf(disconnection_msg, "%c%c%s disconnected.", response, disconnection_msg_length, client->name);
         client_send_massage_in_room(client, (uint8_t *)disconnection_msg, (int)total_length);

@@ -2,6 +2,19 @@
 
 int connected_clients;
 
+void server_end_client_connection(int sockfd)
+{
+    uint8_t total_length;
+    char buffer[22];
+    uint8_t length;
+    request_e request;
+    
+    request = SEND_SERVER_MESSAGE_IN_ROOM;
+    length = strlen(SERVER_FULL_MSG);
+    total_length = sprintf(buffer, "%c%c%s", request, length, SERVER_FULL_MSG);
+    send(sockfd, buffer, total_length, 0);
+}
+
 void *handle_clients(void *arg)
 {
     int client_temp_sockfd;
@@ -18,7 +31,7 @@ void *handle_clients(void *arg)
         client_temp_sockfd = accept(server_sockfd, NULL, NULL);
         connected_clients++;
         printf("Client %d connected\n", connected_clients);
-        
+
         if (client_temp_sockfd == -1)
         {
             perror("accept");
@@ -28,7 +41,7 @@ void *handle_clients(void *arg)
         *(int *)client_sockfd = client_temp_sockfd;
         if (connected_clients > NUM_OF_CONNECTIONS)
         {
-            send(client_temp_sockfd, SERVER_FULL_MSG, strlen(SERVER_FULL_MSG), 0);
+            server_end_client_connection(client_temp_sockfd);
         }
         else
         {
@@ -108,6 +121,6 @@ int main()
 
     pthread_create(&accept_thread, NULL, handle_clients, (void *)&server_sockfd);
     pthread_join(accept_thread, NULL);
-    
+
     return 0;
 }

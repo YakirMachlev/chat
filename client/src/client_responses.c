@@ -123,7 +123,7 @@ void client_responses_send_message_in_room(char *buffer)
     name[name_length] = '\0';
     msg[msg_length] = '\0';
 
-    printf("%s: %s", name, msg);
+    printf("%s: %s\n", name, msg);
 }
 
 void client_responses_exit_room(char *buffer)
@@ -162,5 +162,5 @@ void client_responses_server_send_message_in_room(char *buffer)
     msg = buffer;
     msg[msg_length] = '\0';
 
-    printf("*server message*: %s", msg);
+    printf("*server massage*: %s\n", msg);
 }

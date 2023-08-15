@@ -39,17 +39,17 @@ void *client_ui_start(void *arg)
 
 void client_ui_first_hierarchy(int sockfd)
 {
-    int option;
+    char option;
 
     printf("choose 1 - registration / 2 - login\n> ");
-    scanf("  %d", &option);
+    scanf("%c", &option);
 
-    if (option == 1 || option == 2)
+    if (option == '1' || option == '2')
     {
         pthread_mutex_lock(&mutex);
         is_received = false;
 
-        option == 1 ? client_requests_register(sockfd) : client_requests_login(sockfd);
+        option == '1' ? client_requests_register(sockfd) : client_requests_login(sockfd);
         while (!is_received)
             pthread_cond_wait(&cond, &mutex);
         pthread_mutex_unlock(&mutex);
@@ -97,8 +97,7 @@ void client_ui_third_hierarchy(int sockfd)
     *buffer = '-';
     while (strncmp(buffer, "~`", 3))
     {
-        printf("> ");
-        scanf("%s", buffer);
+        fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
         buffer_length = strlen(buffer);
         client_requests_send_message_in_room(sockfd, buffer, buffer_length);
     }
