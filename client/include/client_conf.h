@@ -18,11 +18,20 @@ typedef struct
     uint8_t room_id;
 } client_t;
 
+typedef enum
+{
+    FIRST_HIERARCHY = 1,
+    SECOND_HIERARCHY,
+    THIRD_HIERARCHY,
+    EXIT,
+    NONE
+} actions_e;
+
 extern client_t client;
 extern pthread_cond_t cond;
 extern pthread_mutex_t mutex;
 extern bool is_received;
-extern uint8_t hierarchy;
+extern actions_e action;
 
 typedef enum
 {

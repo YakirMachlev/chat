@@ -4,23 +4,23 @@ void client_ui_first_hierarchy(int sockfd);
 void client_ui_second_hierarchy(int sockfd);
 void client_ui_third_hierarchy(int sockfd);
 
-#define CALL_HIERARCHY(hierarchy, sockfd)   \
-    switch (hierarchy)                      \
+#define RUN_ACTION(hierarchy, sockfd)       \
+    switch (action)                         \
     {                                       \
-    case 1:                                 \
+    case FIRST_HIERARCHY:                   \
         client_ui_first_hierarchy(sockfd);  \
         break;                              \
-    case 2:                                 \
+    case SECOND_HIERARCHY:                  \
         client_ui_second_hierarchy(sockfd); \
         break;                              \
-    case 3:                                 \
+    case THIRD_HIERARCHY:                   \
         client_ui_third_hierarchy(sockfd);  \
         break;                              \
-    case 4:                                 \
+    case EXIT:                              \
         close(sockfd);                      \
         exit(1);                            \
         break;                              \
-    case 5:                                 \
+    case NONE:                              \
         break;                              \
     }
 
@@ -53,7 +53,7 @@ void client_ui_first_hierarchy(int sockfd)
         while (!is_received)
             pthread_cond_wait(&cond, &mutex);
         pthread_mutex_unlock(&mutex);
-        CALL_HIERARCHY(hierarchy, sockfd)
+        RUN_ACTION(action, sockfd)
     }
     else
     {
@@ -72,7 +72,7 @@ void client_ui_second_hierarchy(int sockfd)
     while (!is_received)
         pthread_cond_wait(&cond, &mutex);
     pthread_mutex_unlock(&mutex);
-    CALL_HIERARCHY(hierarchy, sockfd)
+    RUN_ACTION(action, sockfd)
     room_num = -1;
     while (room_num < 1 || room_num > 5)
     {
@@ -86,7 +86,7 @@ void client_ui_second_hierarchy(int sockfd)
     while (!is_received)
         pthread_cond_wait(&cond, &mutex);
     pthread_mutex_unlock(&mutex);
-    CALL_HIERARCHY(hierarchy, sockfd)
+    RUN_ACTION(action, sockfd)
 }
 
 void client_ui_third_hierarchy(int sockfd)
@@ -95,7 +95,6 @@ void client_ui_third_hierarchy(int sockfd)
     uint16_t buffer_length;
 
     *buffer = '-';
-    puts("");
     while (strncmp(buffer, "~`", 3))
     {
         printf("> ");
@@ -111,6 +110,6 @@ void client_ui_third_hierarchy(int sockfd)
         while (!is_received)
             pthread_cond_wait(&cond, &mutex);
         pthread_mutex_unlock(&mutex);
-        CALL_HIERARCHY(hierarchy, sockfd)
+        RUN_ACTION(action, sockfd)
     }
 }

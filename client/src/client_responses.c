@@ -10,18 +10,18 @@ void client_responses_register(char *buffer)
     result = *(buffer++);
     if (result == 0 && !*buffer)
     {
-        puts("Registration succeded");
-        hierarchy = 1;
+        puts("Registration succeded\n");
+        action = FIRST_HIERARCHY;
     }
     else if (result == -1 && !*buffer)
     {
-        puts("Registration failed");
-        hierarchy = 1;
+        puts("Registration failed\n");
+        action = FIRST_HIERARCHY;
     }
     else
     {
         puts("Invalid response. Shuting down the connection");
-        hierarchy = 4;
+        action = EXIT;
     }
     is_received = true;
     pthread_cond_signal(&cond);
@@ -36,18 +36,18 @@ void client_responses_login(char *buffer)
     result = *buffer;
     if (result == 0 && !*buffer)
     {
-        puts("Login succeded");
-        hierarchy = 2;
+        puts("Login succeded\n");
+        action = SECOND_HIERARCHY;
     }
     else if (result == -1 && !*buffer)
     {
-        puts("Wrong login details");
-        hierarchy = 1;
+        puts("Wrong login details\n");
+        action = FIRST_HIERARCHY;
     }
     else
     {
         puts("Invalid response. Shuting down the connection");
-        hierarchy = 4;
+        action = EXIT;
     }
     is_received = true;
     pthread_cond_signal(&cond);
@@ -64,7 +64,7 @@ void client_responses_list_rooms(char *buffer)
     if (result == -1)
     {
         puts("List rooms failed");
-        hierarchy = 2;
+        action = SECOND_HIERARCHY;
     }
     else
     {
@@ -72,8 +72,9 @@ void client_responses_list_rooms(char *buffer)
         {
             printf("room #%d: %d\n", offset, *(++buffer));
         }
-        hierarchy = 5;
+        action = NONE;
     }
+    puts("");
     is_received = true;
     pthread_cond_signal(&cond);
     pthread_mutex_unlock(&mutex);
@@ -86,18 +87,18 @@ void client_responses_join_room(char *buffer)
     result = *buffer;
     if (result == 0 && !*buffer)
     {
-        puts("Join succeded");
-        hierarchy = 3;
+        puts("Join succeded\n");
+        action = THIRD_HIERARCHY;
     }
     else if (result == -1 && !*buffer)
     {
-        puts("Join failed");
-        hierarchy = 2;
+        puts("Join failed\n");
+        action = SECOND_HIERARCHY;
     }
     else
     {
         puts("Invalid response. Shuting down the connection");
-        hierarchy = 4;
+        action = EXIT;
     }
     is_received = true;
     pthread_cond_signal(&cond);
@@ -133,18 +134,18 @@ void client_responses_exit_room(char *buffer)
     result = *buffer;
     if (result == 0 && !*buffer)
     {
-        puts("Exit room succeded");
-        hierarchy = 2;
+        puts("Exit room succeded\n");
+        action = SECOND_HIERARCHY;
     }
     else if (result == -1 && !*buffer)
     {
-        puts("Exit room failed");
-        hierarchy = 3;
+        puts("Exit room failed\n");
+        action = THIRD_HIERARCHY;
     }
     else
     {
         puts("Invalid response. Shuting down the connection");
-        hierarchy = 4;
+        action = EXIT;
     }
     is_received = true;
     pthread_cond_signal(&cond);
@@ -161,5 +162,5 @@ void client_responses_server_send_message_in_room(char *buffer)
     msg = buffer;
     msg[msg_length] = '\0';
 
-    printf("*server*: %s\n", msg);
+    printf("*server message*: %s", msg);
 }

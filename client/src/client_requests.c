@@ -1,7 +1,5 @@
 #include "client_requests.h"
 
-client_t client;
-
 static bool client_requests_check_name_validity(char *name)
 {
     uint8_t offset;

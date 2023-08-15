@@ -5,7 +5,6 @@ static void handle_recv_from_server(char *buffer, int length)
     response_e response;
     
     response = (uint8_t)*(buffer++);
-    printf("response: %d\n", response);
     switch (response)
     {
     case REGISTER_RESPONSE:
@@ -30,7 +29,7 @@ static void handle_recv_from_server(char *buffer, int length)
         client_responses_server_send_message_in_room(buffer);
         break;
     default:
-        puts("Invalid response.");
+        puts("Invalid response. Shuting down the connection");
         close(client.sockfd);
         exit(1);
         break;

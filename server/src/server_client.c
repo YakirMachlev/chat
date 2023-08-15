@@ -51,6 +51,7 @@ void *server_client_handle_functions(void *arg)
                 client_join_room(client, buffer_ptr);
                 break;
             case SEND_MESSAGE_IN_ROOM_REQUEST:
+                *buffer = SEND_MESSAGE_IN_ROOM_RESPONSE;
                 client_send_massage_in_room(client, buffer, bytes_received);
                 break;
             case EXIT_ROOM_REQUEST:
