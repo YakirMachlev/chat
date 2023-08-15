@@ -17,4 +17,5 @@ void client_login(client_t *client, uint8_t *buffer);
 void client_list_rooms(client_t *client);
 void client_join_room(client_t *client, uint8_t *buffer);
 void client_send_massage_in_room(client_t *client, uint8_t *buffer, int length);
+void client_send_server_massage_in_room(client_t *client, uint8_t *buffer, int length);
 void client_exit_room(client_t *client);

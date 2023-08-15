@@ -16,8 +16,8 @@ void init_chat_rooms()
     {
         chat_rooms[room_num].num_of_clients = 0;
         pthread_mutex_init(&(chat_rooms[room_num].lock), NULL);
-        pthread_mutex_lock(&(chat_rooms[room_num].lock));
-    }
+/*         pthread_mutex_lock(&(chat_rooms[room_num].lock));
+ */    }
 }
 
 void add_client_to_room(client_t *client, uint8_t room_num)
@@ -26,9 +26,10 @@ void add_client_to_room(client_t *client, uint8_t room_num)
     room_t *room;
     room = &chat_rooms[room_num];
     pthread_mutex_lock(&(room->lock));
-    room_num_of_clients = room->num_of_clients++;
+    room_num_of_clients = ++room->num_of_clients;
     room->clients[room_num_of_clients] = client;
     pthread_mutex_unlock(&(room->lock));
+    printf("num of clients: %d\n", room->num_of_clients);
 }
 
 void remove_client_from_room(client_t *client)
@@ -60,16 +61,20 @@ void get_rooms_list(client_t *client, uint8_t *rooms_list)
     }
 }
 
-void send_message_to_room(uint8_t room_id, char *msg, int len)
+void send_message_to_room(client_t *client, char *msg, int len)
 {
     uint8_t client_num;
     room_t *room;
 
-    room = &chat_rooms[room_id];
+    room = &chat_rooms[client->room_id];
     pthread_mutex_lock(&(room->lock));
     for (client_num = 0; client_num < room->num_of_clients; client_num++)
     {
-        send(room->clients[client_num]->sockfd, msg, len, 0);
+        if (room->clients[client_num]->sockfd != client->sockfd) /* don't send to myself */
+        {
+            send(room->clients[client_num]->sockfd, msg, len, 0);
+        }
     }
+    puts("ma ate");
     pthread_mutex_unlock(&(room->lock));
 }

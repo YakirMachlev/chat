@@ -52,8 +52,8 @@ void client_ui_first_hierarchy(int sockfd)
         option == 1 ? client_requests_register(sockfd) : client_requests_login(sockfd);
         while (!is_received)
             pthread_cond_wait(&cond, &mutex);
-        CALL_HIERARCHY(hierarchy, sockfd)
         pthread_mutex_unlock(&mutex);
+        CALL_HIERARCHY(hierarchy, sockfd)
     }
     else
     {
@@ -71,6 +71,7 @@ void client_ui_second_hierarchy(int sockfd)
     client_requests_list_rooms(sockfd);
     while (!is_received)
         pthread_cond_wait(&cond, &mutex);
+    pthread_mutex_unlock(&mutex);
     CALL_HIERARCHY(hierarchy, sockfd)
     room_num = -1;
     while (room_num < 1 || room_num > 5)
@@ -78,14 +79,14 @@ void client_ui_second_hierarchy(int sockfd)
         printf("Choose which room you want to join\n> ");
         scanf("%d", &room_num);
     }
-
+    pthread_mutex_lock(&mutex);
     client.room_id = room_num;
     is_received = false;
     client_requests_join_room(sockfd);
     while (!is_received)
         pthread_cond_wait(&cond, &mutex);
-    CALL_HIERARCHY(hierarchy, sockfd)
     pthread_mutex_unlock(&mutex);
+    CALL_HIERARCHY(hierarchy, sockfd)
 }
 
 void client_ui_third_hierarchy(int sockfd)
@@ -94,22 +95,22 @@ void client_ui_third_hierarchy(int sockfd)
     uint16_t buffer_length;
 
     *buffer = '-';
+    puts("");
     while (strncmp(buffer, "~`", 3))
     {
-        printf("\n> ");
+        printf("> ");
         scanf("%s", buffer);
         buffer_length = strlen(buffer);
         client_requests_send_message_in_room(sockfd, buffer, buffer_length);
     }
-    if (strncmp(buffer, "~`", 3))
+    if (buffer[0] == '~' && buffer[1] == '`')
     {
+        pthread_mutex_lock(&mutex);
         is_received = false;
         client_requests_exit_room(sockfd);
         while (!is_received)
             pthread_cond_wait(&cond, &mutex);
-        CALL_HIERARCHY(hierarchy, sockfd)
         pthread_mutex_unlock(&mutex);
-        close(sockfd);
-        exit(0);
+        CALL_HIERARCHY(hierarchy, sockfd)
     }
 }

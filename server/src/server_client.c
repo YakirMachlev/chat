@@ -27,7 +27,6 @@ void *server_client_handle_functions(void *arg)
             {
                 perror("recv");
             }
-            puts("ok");
             ASSERT(0)
         }
         else

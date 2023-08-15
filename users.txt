@@ -6,3 +6,6 @@ s,s
 yu,c
 js,s
 kd,s
+ysak,ke
+dor,haluzer
+1,1

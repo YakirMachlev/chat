@@ -62,12 +62,12 @@ void client_login(client_t *client, uint8_t *buffer)
     {
         client->state = CONNECTED;
         SEND_RESULT(client, error, LOGIN_RESPONSE, 0);
-        printf("sent: %d,%d", LOGIN_RESPONSE, 0);
+        printf("sent: %d,%d\n", LOGIN_RESPONSE, 0);
     }
     else
     {
         SEND_RESULT(client, error, LOGIN_RESPONSE, -1);
-        printf("sent: %d,%d", LOGIN_RESPONSE, -1);
+        printf("sent: %d,%d\n", LOGIN_RESPONSE, -1);
     }
 }
 
@@ -75,19 +75,26 @@ void client_list_rooms(client_t *client)
 {
     uint8_t rooms_list[NUM_OF_ROOMS + 2];
     uint8_t error[ERROR_LENGTH];
-
+    int offset;
+    
     rooms_list[0] = LIST_ROOMS_RESPONSE;
     rooms_list[1] = NUM_OF_ROOMS;
     if (client->state == CONNECTED)
     {
         get_rooms_list(client, rooms_list + 2);
         send(client->sockfd, rooms_list, sizeof(rooms_list) / sizeof(uint8_t), 0);
-        printf("sent: %d,%d,%s", rooms_list[0], rooms_list[1], rooms_list + 2);
+
+        printf("sent: %d,%d ", rooms_list[0], rooms_list[1]);
+        for (offset = 0; offset < NUM_OF_ROOMS; offset++)
+        {
+            printf("%d ", rooms_list[2 + offset]);
+        }
+        puts("");
     }
     else
     {
         SEND_RESULT(client, error, LIST_ROOMS_RESPONSE, -1);
-        printf("sent: %d,%d", LIST_ROOMS_RESPONSE, -1);
+        printf("sent: %d,%d\n", LIST_ROOMS_RESPONSE, -1);
     }
 }
 
@@ -104,33 +111,45 @@ void client_join_room(client_t *client, uint8_t *buffer)
     buffer += name_length;
     room_num = *buffer;
     ASSERT(room_num <= 5 && room_num >= 1)
-    room_num--; /* assuming that the client isn't aware that arrays start at 0 */
+    room_num--; /* assuming that the client doesn't know that arrays start at 0 */
 
     if (client->state == CONNECTED)
     {
-        connection_msg_len = sprintf(connection_msg, "%s connected.", client->name);
-        send_message_to_room(room_num, connection_msg, connection_msg_len);
+        SEND_RESULT(client, error, JOIN_ROOM_RESPONSE, 0);
+        printf("sent: %d,%d\n", JOIN_ROOM_RESPONSE, 0);
+
         add_client_to_room(client, room_num);
         client->state = JOINED;
         client->room_id = room_num;
-        SEND_RESULT(client, error, JOIN_ROOM_RESPONSE, 0);
-        printf("sent: %d,%d", JOIN_ROOM_RESPONSE, -1);
+        
+        connection_msg_len = sprintf(connection_msg, "%s connected.", client->name);
+        client_send_server_massage_in_room(room_num, connection_msg, connection_msg_len);
     }
     else
     {
         SEND_RESULT(client, error, JOIN_ROOM_RESPONSE, -1);
-        printf("sent: %d,%d", JOIN_ROOM_RESPONSE, -1);
+        printf("sent: %d,%d\n", JOIN_ROOM_RESPONSE, -1);
+    }
+}
+
+static void client_massage_in_room(client_t *client, uint8_t *buffer, int length, response_e response)
+{
+    *buffer = response;
+    if (client->state == JOINED)
+    {
+        send_message_to_room(client, (char *)buffer, length);
+        printf("sent: %d,%s\n", *buffer, buffer + 1);
     }
 }
 
 void client_send_massage_in_room(client_t *client, uint8_t *buffer, int length)
 {
-    *buffer = SEND_MESSAGE_IN_ROOM_RESPONSE;
-    if (client->state == JOINED)
-    {
-        send_message_to_room(client->room_id, (char *)buffer, length);
-    }
-    printf("sent: %d,%s", *buffer, buffer + 1);
+    client_massage_in_room(client, buffer,length, SEND_MESSAGE_IN_ROOM_RESPONSE);
+}
+
+void client_send_server_massage_in_room(client_t *client, uint8_t *buffer, int length)
+{
+    client_massage_in_room(client, buffer,length, SEND_SERVER_MESSAGE_IN_ROOM);
 }
 
 void client_exit_room(client_t *client)
@@ -146,11 +165,11 @@ void client_exit_room(client_t *client)
         client->state = CONNECTED;
         client->room_id = -1;
         SEND_RESULT(client, error, EXIT_ROOM_RESPONSE, 0);
-        printf("sent: %d,%d", EXIT_ROOM_RESPONSE, 0);
+        printf("sent: %d,%d\n", EXIT_ROOM_RESPONSE, 0);
     }
     else
     {
         SEND_RESULT(client, error, EXIT_ROOM_RESPONSE, -1);
-        printf("sent: %d,%d", EXIT_ROOM_RESPONSE, -1);
+        printf("sent: %d,%d\n", EXIT_ROOM_RESPONSE, -1);
     }
 }

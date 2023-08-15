@@ -82,7 +82,6 @@ void client_responses_list_rooms(char *buffer)
 void client_responses_join_room(char *buffer)
 {
     int8_t result;
-
     pthread_mutex_lock(&mutex);
     result = *buffer;
     if (result == 0 && !*buffer)

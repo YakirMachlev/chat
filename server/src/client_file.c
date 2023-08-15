@@ -33,24 +33,12 @@ void insert_client_to_file(char *name, char *password)
     pthread_mutex_unlock(&file_lock);
 }
 
-static uint8_t compare_until_char(char* str1, char* str2, char ch)
-{
-    uint8_t offset;
-    for (offset = 0; offset < 16 && str1[offset] != ch && str2[offset] != ch; offset++)
-    {
-        if (str1[offset] != str2[offset])
-        {
-            return false;
-        }
-    }
-    return offset;
-}
-
 bool client_file_does_client_exist(char *name)
 {
     FILE *fp;
     char line[MAX_LINE_LENGTH];
-    bool exists;    
+    bool exists;
+    uint8_t length;
 
     pthread_mutex_lock(&file_lock);
     fp = fopen("users.txt", "r");
@@ -59,13 +47,14 @@ bool client_file_does_client_exist(char *name)
     {
         while (fgets(line, MAX_LINE_LENGTH, fp) && !exists)
         {
-            exists = compare_until_char(line, name, ',');
+            length = strchr(line, ',') - line;
+            exists = !strncmp(name, line, length);
         }
-        fclose(fp);        
+        fclose(fp);
     }
     pthread_mutex_unlock(&file_lock);
 
-    return !!exists;
+    return exists;
 }
 
 bool client_file_check_client_validity(char *name, char *password)
@@ -73,21 +62,19 @@ bool client_file_check_client_validity(char *name, char *password)
     FILE *fp;
     char line[MAX_LINE_LENGTH];
     uint8_t length;
+    bool valid;
 
     pthread_mutex_lock(&file_lock);
     fp = fopen("users.txt", "r");
-    
+    valid = false;
     if (fp)
     {
-        while (fgets(line, MAX_LINE_LENGTH, fp))
+        while (fgets(line, MAX_LINE_LENGTH, fp) && !valid)
         {
-            if ((length = compare_until_char(line, name, ',')))
-            {
-                length &= strncmp(password, line + length + 1, PASSWORD_MAX_LENGTH);
-                break;
-            }
+            length = strchr(line, ',') - line;
+            valid = !strncmp(name, line, length) && !strncmp(password, line + length + 1, PASSWORD_MAX_LENGTH);
         }
-        fclose(fp);        
+        fclose(fp);
     }
     pthread_mutex_unlock(&file_lock);
     return length;
