@@ -9,3 +9,6 @@ kd,s
 ysak,ke
 dor,haluzer
 1,1
+luk,s
+lokiur,h
+heasdf,j

@@ -68,7 +68,8 @@ void client_responses_list_rooms(char *buffer)
     }
     else
     {
-        for (offset = 1; offset <= result; offset++)
+        num_of_rooms = result;
+        for (offset = 1; offset <= num_of_rooms; offset++)
         {
             printf("room #%d: %d\n", offset, *(++buffer));
         }
@@ -93,6 +94,7 @@ void client_responses_join_room(char *buffer)
     else if (result == -1 && !*buffer)
     {
         puts("Join failed\n");
+        client.room_id = -1;
         action = SECOND_HIERARCHY;
     }
     else
@@ -155,10 +157,9 @@ void client_responses_exit_room(char *buffer)
 void client_responses_server_send_message_in_room(char *buffer)
 {
     char *msg;
-    uint16_t msg_length;
+    uint8_t msg_length;
 
-    msg_length = *(buffer++) << 8;
-    msg_length |= *(buffer++);
+    msg_length = *(buffer++);
     msg = buffer;
     msg[msg_length] = '\0';
 

@@ -62,14 +62,14 @@ void client_requests_login(int sockfd)
 
 void client_requests_list_rooms(int sockfd)
 {
-    char request;
+    uint8_t request;
     request = LIST_ROOMS_REQUEST;
     send(sockfd, &request, 1, 0);
 }
 
 void client_requests_join_room(int sockfd)
 {
-    char buffer[NAME_MAX_LENGTH + 3];
+    char buffer[NAME_MAX_LENGTH + 4];
     uint8_t total_length;
     request_e request;
 
@@ -86,16 +86,19 @@ void client_requests_send_message_in_room(int sockfd, char *msg, uint16_t msg_le
 
     request = SEND_MESSAGE_IN_ROOM_REQUEST;
     total_length = sprintf(buffer, "%c%c%s%hd%s", request, client.name_length, client.name, msg_length, msg);
+    printf("%d,%d,", *buffer, *(buffer + 1));
+    printf("%s\n", buffer + 2);
     send(sockfd, buffer, total_length, 0);
 }
 
 void client_requests_exit_room(int sockfd)
 {
-    char buffer[NAME_MAX_LENGTH + 2];
+    char buffer[NAME_MAX_LENGTH + 3];
     uint8_t total_length;
     request_e request;
 
     request = EXIT_ROOM_REQUEST;
     total_length = sprintf(buffer, "%c%c%s", request, client.name_length, client.name);
     send(sockfd, buffer, total_length, 0);
+    printf("%s exited from room %d\n", client.name, client.room_id);
 }

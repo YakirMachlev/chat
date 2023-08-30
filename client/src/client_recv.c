@@ -25,7 +25,7 @@ static void handle_recv_from_server(char *buffer, int length)
     case EXIT_ROOM_RESPONSE:
         client_responses_exit_room(buffer);
         break;
-    case SEND_SERVER_MESSAGE_IN_ROOM:
+    case SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE:
         client_responses_server_send_message_in_room(buffer);
         break;
     default:
@@ -65,5 +65,5 @@ void *receive_data_from_server(void *arg)
         handle_recv_from_server(buffer, bytes_received);
     }
 
-    return NULL;
+    pthread_exit(NULL);
 }

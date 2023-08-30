@@ -7,13 +7,18 @@
 #include "client_ui.h"
 #include "client_recv.h"
 
+#define EXIT_PROGRAM(msg)         \
+    fprintf(stderr, "%s\n", msg); \
+    exit(1);
+
 client_t client;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 bool is_received = false;
 actions_e action;
+uint8_t num_of_rooms;
 
-int client_find_server_valid_address(struct addrinfo *servinfo)
+static int client_find_server_valid_socket(struct addrinfo *servinfo)
 {
     int sockfd;
     struct addrinfo *p;
@@ -36,34 +41,44 @@ int client_find_server_valid_address(struct addrinfo *servinfo)
     freeaddrinfo(servinfo);
     if (p == NULL)
     {
-        fprintf(stderr, "client: failed to connect\n");
-        exit(1);
+        EXIT_PROGRAM("client: failed to connect")
     }
 
     return sockfd;
 }
 
-int main()
+/**
+ * @brief gets the client's socket file descriptor
+ *
+ * @return int client socket file descriptor on success, else NULL
+ */
+static int client_get_socket()
 {
-    int sockfd;
-    int rv;
+    int fd;
     struct addrinfo hints;
-    struct addrinfo *servinfo;
-    pthread_t receive_thread;
-    pthread_t client_ui_thread;
-    
-    memset(&hints, 0, sizeof hints);
+    struct addrinfo *server_info;
+    int8_t err;
+
+    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((rv = getaddrinfo(SERVER_IP, SERVER_PORT, &hints, &servinfo)) != 0)
+    if ((err = getaddrinfo(SERVER_IP, SERVER_PORT, &hints, &server_info)) != 0)
     {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        exit(1);
+        EXIT_PROGRAM(gai_strerror(err))
     }
+    fd = client_find_server_valid_socket(server_info);
 
-    sockfd = client_find_server_valid_address(servinfo);
+    return fd;
+}
 
+int main()
+{
+    int sockfd;
+    pthread_t receive_thread;
+    pthread_t client_ui_thread;
+
+    sockfd = client_get_socket();
     pthread_create(&client_ui_thread, NULL, client_ui_start, (void *)&sockfd);
     pthread_create(&receive_thread, NULL, receive_data_from_server, (void *)&sockfd);
     pthread_join(client_ui_thread, NULL);

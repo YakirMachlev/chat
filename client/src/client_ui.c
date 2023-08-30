@@ -34,7 +34,7 @@ void *client_ui_start(void *arg)
     client.sockfd = sockfd;
     client_ui_first_hierarchy(sockfd);
 
-    return NULL;
+    pthread_exit(NULL);
 }
 
 void client_ui_first_hierarchy(int sockfd)
@@ -74,9 +74,9 @@ void client_ui_second_hierarchy(int sockfd)
     pthread_mutex_unlock(&mutex);
     RUN_ACTION(action, sockfd)
     room_num = -1;
-    while (room_num < 1 || room_num > 5)
+    while (room_num < 1 || room_num > num_of_rooms)
     {
-        printf("Choose which room you want to join\n> ");
+        printf("Choose which room you want to join (1-%d)\n> ", num_of_rooms);
         scanf("%d", &room_num);
     }
     pthread_mutex_lock(&mutex);
@@ -94,11 +94,13 @@ void client_ui_third_hierarchy(int sockfd)
     char buffer[CLEAR_DATA_MAX_LENGTH];
     uint16_t buffer_length;
 
+    fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
     *buffer = '-';
     while (strncmp(buffer, "~`", 3))
     {
         fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
         buffer_length = strlen(buffer);
+        printf("buffer length: %d\n", buffer_length);
         client_requests_send_message_in_room(sockfd, buffer, buffer_length);
     }
     if (buffer[0] == '~' && buffer[1] == '`')

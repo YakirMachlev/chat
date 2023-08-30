@@ -12,7 +12,6 @@ void *server_client_handle_functions(void *arg)
     int client_sockfd;
     uint8_t opcode;
     uint8_t buffer[DATA_MAX_LENGTH];
-    uint8_t *buffer_ptr;
     int bytes_received;
 
     client_sockfd = *(int *)arg;
@@ -31,27 +30,25 @@ void *server_client_handle_functions(void *arg)
         }
         else
         {
-            buffer_ptr = buffer;
             buffer[bytes_received] = '\0';
-            opcode = *(buffer_ptr++);
+            opcode = *buffer;
 
             printf("request: %d\n", opcode);
             switch (opcode)
             {
             case REGISTER_REQUEST:
-                client_register(client, buffer_ptr);
+                client_register(client, buffer + 1);
                 break;
             case LOGIN_REQUEST:
-                client_login(client, buffer_ptr);
+                client_login(client, buffer + 1);
                 break;
             case LIST_ROOMS_REQUEST:
                 client_list_rooms(client);
                 break;
             case JOIN_ROOM_REQUEST:
-                client_join_room(client, buffer_ptr);
+                client_join_room(client, buffer + 1);
                 break;
             case SEND_MESSAGE_IN_ROOM_REQUEST:
-                *buffer = SEND_MESSAGE_IN_ROOM_RESPONSE;
                 client_send_massage_in_room(client, buffer, bytes_received);
                 break;
             case EXIT_ROOM_REQUEST:

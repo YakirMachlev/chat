@@ -4,11 +4,11 @@
 
 #define PORT "1234"
 #define NUM_OF_CONNECTIONS 50
-#define SERVER_FULL_MSG "Current server full"
-#define NAME_MAX_LENGTH 13
-#define PASSWORD_MAX_LENGTH 33
+#define SERVER_FULL_MSG "Server currently full"
+#define NAME_MAX_LENGTH 12
+#define PASSWORD_MAX_LENGTH 32
 #define DATA_MAX_LENGTH 1 << (sizeof(uint16_t) * 8)
-#define ERROR_LENGTH 2
+#define ERROR_LENGTH 3
 
 extern int connected_clients;
 
@@ -39,7 +39,7 @@ typedef enum
 typedef struct
 {
     int sockfd;
-    uint8_t room_id;
+    int8_t room_id;
     char name[NAME_MAX_LENGTH];
     state_e state;
 } client_t;
@@ -62,5 +62,5 @@ typedef enum
     JOIN_ROOM_RESPONSE,
     SEND_MESSAGE_IN_ROOM_RESPONSE,
     EXIT_ROOM_RESPONSE,
-    SEND_SERVER_MESSAGE_IN_ROOM = 211
+    SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE = 211
 } response_e;

@@ -2,17 +2,22 @@
 
 int connected_clients;
 
-void server_end_client_connection(int sockfd)
+#define EXIT_PROGRAM(msg)         \
+    fprintf(stderr, "%s\n", msg); \
+    exit(1);
+
+void server_end_client_connection(int client_sockfd)
 {
     uint8_t total_length;
-    char buffer[22];
+    char buffer[24];
     uint8_t length;
-    request_e request;
     
-    request = SEND_SERVER_MESSAGE_IN_ROOM;
     length = strlen(SERVER_FULL_MSG);
-    total_length = sprintf(buffer, "%c%c%s", request, length, SERVER_FULL_MSG);
-    send(sockfd, buffer, total_length, 0);
+    total_length = sprintf(buffer, "%c%c%s", (uint8_t)SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE, length, SERVER_FULL_MSG);
+    send(client_sockfd, buffer, total_length, 0);
+
+    connected_clients--;
+    close(client_sockfd);
 }
 
 void *handle_clients(void *arg)
@@ -20,15 +25,15 @@ void *handle_clients(void *arg)
     int client_temp_sockfd;
     void *client_sockfd;
     pthread_t client_thread;
-    int server_sockfd;
+    int listener;
 
     pthread_detach(pthread_self());
 
-    server_sockfd = *(int *)arg;
+    listener = *(int *)arg;
     while (true)
     {
         client_sockfd = (int *)malloc(sizeof(int));
-        client_temp_sockfd = accept(server_sockfd, NULL, NULL);
+        client_temp_sockfd = accept(listener, NULL, NULL);
         connected_clients++;
         printf("Client %d connected\n", connected_clients);
 
@@ -52,7 +57,14 @@ void *handle_clients(void *arg)
     return NULL;
 }
 
-int server_find_valid_address(struct addrinfo *servinfo)
+/**
+ * @brief finds a valid socket for the server according to the
+ * information specified in the given server info
+ *
+ * @param servinfo the server info
+ * @return int the server socket file descriptor
+ */
+static int server_find_valid_socket(struct addrinfo *servinfo)
 {
     int server_socket;
     struct addrinfo *p;
@@ -88,38 +100,48 @@ int server_find_valid_address(struct addrinfo *servinfo)
     return server_socket;
 }
 
-int main()
+/**
+ * @brief gets the server's listener socket file descriptor
+ *
+ * @return int listener socket file descriptor on success, else NULL
+ */
+static int server_get_listener_socket()
 {
-    int server_sockfd;
-    int rv;
+    int listener;
     struct addrinfo hints;
-    struct addrinfo *servinfo;
-    pthread_t accept_thread;
-
-    init_chat_rooms();
-    connected_clients = 0;
+    struct addrinfo *server_info;
+    int8_t err;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0)
+    if ((err = getaddrinfo(NULL, PORT, &hints, &server_info)))
     {
-        fprintf(stderr, "server: %s\n", gai_strerror(rv));
-        exit(1);
+        EXIT_PROGRAM(gai_strerror(err))
     }
-    server_sockfd = server_find_valid_address(servinfo);
-
-    if (listen(server_sockfd, NUM_OF_CONNECTIONS) == -1)
+    listener = server_find_valid_socket(server_info);
+    if (listen(listener, NUM_OF_CONNECTIONS + 1) == -1)
     {
-        perror("listen");
-        exit(1);
+        EXIT_PROGRAM("Error getting listening socket")
     }
 
+    return listener;
+}
+
+int main()
+{
+    int listener;
+    pthread_t accept_thread;
+
+    init_chat_rooms();
+    connected_clients = 0;
+
+    listener = server_get_listener_socket();
     puts("Waiting for connections");
 
-    pthread_create(&accept_thread, NULL, handle_clients, (void *)&server_sockfd);
+    pthread_create(&accept_thread, NULL, handle_clients, (void *)(&listener));
     pthread_join(accept_thread, NULL);
 
     return 0;
