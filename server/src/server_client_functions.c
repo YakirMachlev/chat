@@ -140,10 +140,9 @@ static void printnf(char *str, int n)
     }
 }
 
-
 void client_send_massage_in_room(client_t *client, uint8_t *buffer, int length)
 {
-    uint16_t msg_length;
+    uint8_t msg_length;
 
     if (client->state == JOINED)
     {
@@ -153,11 +152,9 @@ void client_send_massage_in_room(client_t *client, uint8_t *buffer, int length)
         printf("sent: %d,%d,", *buffer, *(buffer + 1));
         printnf((char *)(buffer + 2), *(buffer + 1));
         buffer += 2 + *(buffer + 1);
-        msg_length = *(buffer++) << 8;
-        msg_length |= *(buffer++);
+        msg_length = *(buffer++);
         printf(",%d,", msg_length);
         printnf((char *)buffer, msg_length);
-        puts("");
     }
 }
 
@@ -173,15 +170,15 @@ void client_exit_room(client_t *client)
     {
         SEND_RESULT(client, error, EXIT_ROOM_RESPONSE, 0);
 
+        response = SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE;
+        disconnection_msg_length = strlen(client->name) + 14;
+        total_length = sprintf(disconnection_msg, "%c%c%s disconnected.", response, disconnection_msg_length, client->name);
+        send_message_to_room(client, disconnection_msg, (int)total_length);
+
         printf("%s exited room %d\n", client->name, client->room_id + 1);
         remove_client_from_room(client);
         client->state = CONNECTED;
         client->room_id = -1;
-
-        response = SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE;
-        disconnection_msg_length = strlen(client->name) + 14;
-        total_length = sprintf(disconnection_msg, "%c%c%s disconnected.", response, disconnection_msg_length, client->name);
-        client_send_massage_in_room(client, (uint8_t *)disconnection_msg, (int)total_length);
     }
     else
     {

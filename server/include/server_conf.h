@@ -7,7 +7,7 @@
 #define SERVER_FULL_MSG "Server currently full"
 #define NAME_MAX_LENGTH 12
 #define PASSWORD_MAX_LENGTH 32
-#define DATA_MAX_LENGTH 1 << (sizeof(uint16_t) * 8)
+#define DATA_MAX_LENGTH 1 << (sizeof(uint8_t) * 8)
 #define ERROR_LENGTH 3
 
 extern int connected_clients;

@@ -6,7 +6,7 @@
 #define SERVER_PORT "1234"
 #define NAME_MAX_LENGTH 12
 #define PASSWORD_MAX_LENGTH 32
-#define DATA_MAX_LENGTH (1 << (sizeof(uint16_t) * 8))
+#define DATA_MAX_LENGTH (1 << (sizeof(uint8_t) * 8))
 #define CLIENT_DATA_LENGTH NAME_MAX_LENGTH + PASSWORD_MAX_LENGTH + 4
 #define CLEAR_DATA_MAX_LENGTH DATA_MAX_LENGTH - NAME_MAX_LENGTH - 3
 

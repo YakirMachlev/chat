@@ -42,7 +42,7 @@ void client_ui_first_hierarchy(int sockfd)
     char option;
 
     printf("choose 1 - registration / 2 - login\n> ");
-    scanf("%c", &option);
+    scanf(" %c", &option);
 
     if (option == '1' || option == '2')
     {
@@ -92,25 +92,22 @@ void client_ui_second_hierarchy(int sockfd)
 void client_ui_third_hierarchy(int sockfd)
 {
     char buffer[CLEAR_DATA_MAX_LENGTH];
-    uint16_t buffer_length;
+    uint8_t buffer_length;
 
     fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
-    *buffer = '-';
-    while (strncmp(buffer, "~`", 3))
+    fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
+    while (strncmp(buffer, "~`\n", 3))
     {
-        fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
         buffer_length = strlen(buffer);
-        printf("buffer length: %d\n", buffer_length);
         client_requests_send_message_in_room(sockfd, buffer, buffer_length);
+        fgets(buffer, CLEAR_DATA_MAX_LENGTH, stdin);
     }
-    if (buffer[0] == '~' && buffer[1] == '`')
-    {
-        pthread_mutex_lock(&mutex);
-        is_received = false;
-        client_requests_exit_room(sockfd);
-        while (!is_received)
-            pthread_cond_wait(&cond, &mutex);
-        pthread_mutex_unlock(&mutex);
-        RUN_ACTION(action, sockfd)
-    }
+
+    pthread_mutex_lock(&mutex);
+    is_received = false;
+    client_requests_exit_room(sockfd);
+    while (!is_received)
+        pthread_cond_wait(&cond, &mutex);
+    pthread_mutex_unlock(&mutex);
+    RUN_ACTION(action, sockfd)
 }

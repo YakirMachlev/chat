@@ -18,5 +18,5 @@ void client_requests_register(int sockfd);
 void client_requests_login(int sockfd);
 void client_requests_list_rooms(int sockfd);
 void client_requests_join_room(int sockfd);
-void client_requests_send_message_in_room(int sockfd, char *msg, uint16_t msg_length);
+void client_requests_send_message_in_room(int sockfd, char *msg, uint8_t msg_length);
 void client_requests_exit_room(int sockfd);

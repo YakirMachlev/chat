@@ -112,20 +112,19 @@ void client_responses_send_message_in_room(char *buffer)
     char *name;
     char *msg;
     uint8_t name_length;
-    uint16_t msg_length;
+    uint8_t msg_length;
 
     name_length = *(buffer++);
     name = buffer;
 
     buffer += name_length;
-    msg_length = *(buffer++) << 8;
-    msg_length |= *(buffer++);
+    msg_length = *(buffer++);
     msg = buffer;
 
     name[name_length] = '\0';
     msg[msg_length] = '\0';
 
-    printf("%s: %s\n", name, msg);
+    printf("%s: %s", name, msg);
 }
 
 void client_responses_exit_room(char *buffer)
