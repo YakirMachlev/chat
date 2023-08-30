@@ -33,7 +33,7 @@ void client_responses_login(char *buffer)
     int8_t result;
 
     pthread_mutex_lock(&mutex);
-    result = *buffer;
+    result = *(buffer++);
     if (result == 0 && !*buffer)
     {
         puts("Login succeded\n");
@@ -60,8 +60,8 @@ void client_responses_list_rooms(char *buffer)
     uint8_t offset;
 
     pthread_mutex_lock(&mutex);
-    result = *buffer;
-    if (result == -1)
+    result = *(buffer++);
+    if (result == -1 && !*buffer)
     {
         puts("List rooms failed");
         action = SECOND_HIERARCHY;
@@ -71,7 +71,7 @@ void client_responses_list_rooms(char *buffer)
         num_of_rooms = result;
         for (offset = 1; offset <= num_of_rooms; offset++)
         {
-            printf("room #%d: %d\n", offset, *(++buffer));
+            printf("room #%d: %d\n", offset, *(buffer++));
         }
         action = NONE;
     }
@@ -85,7 +85,7 @@ void client_responses_join_room(char *buffer)
 {
     int8_t result;
     pthread_mutex_lock(&mutex);
-    result = *buffer;
+    result = *(buffer++);
     if (result == 0 && !*buffer)
     {
         puts("Join succeded\n");
@@ -132,7 +132,7 @@ void client_responses_exit_room(char *buffer)
     int8_t result;
 
     pthread_mutex_lock(&mutex);
-    result = *buffer;
+    result = *(buffer++);
     if (result == 0 && !*buffer)
     {
         puts("Exit room succeded\n");

@@ -57,6 +57,16 @@ bool client_file_does_client_exist(char *name)
     return exists;
 }
 
+static bool compare_until_char(char *str1, char *str2, char separator)
+{
+    while (*str1 && *str2 && *str1 != separator && *str2 != separator)
+    {
+        if (*(str1++) != *(str2++))
+            return false;
+    }
+    return true;
+}
+
 bool client_file_check_client_validity(char *name, char *password)
 {
     FILE *fp;
@@ -72,10 +82,10 @@ bool client_file_check_client_validity(char *name, char *password)
         while (fgets(line, MAX_LINE_LENGTH, fp) && !valid)
         {
             length = strchr(line, ',') - line;
-            valid = !strncmp(name, line, length) && !strncmp(password, line + length + 1, PASSWORD_MAX_LENGTH);
+            valid = !strncmp(name, line, length) && compare_until_char(password, line + length + 1, '\n');
         }
         fclose(fp);
     }
     pthread_mutex_unlock(&file_lock);
-    return length;
+    return valid;
 }
