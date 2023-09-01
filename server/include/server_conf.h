@@ -4,7 +4,6 @@
 
 #define PORT "1234"
 #define NUM_OF_CONNECTIONS 50
-#define SERVER_FULL_MSG "Server currently full"
 #define NAME_MAX_LENGTH 12
 #define PASSWORD_MAX_LENGTH 32
 #define DATA_MAX_LENGTH 1 << (sizeof(uint8_t) * 8)

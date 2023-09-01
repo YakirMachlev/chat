@@ -2,33 +2,24 @@
 
 int connected_clients;
 
+#define SERVER_FULL_MSG "server currently full"
+
 #define EXIT_PROGRAM(msg)         \
     fprintf(stderr, "%s\n", msg); \
     exit(1);
-
-void server_end_client_connection(int client_sockfd)
-{
-    uint8_t total_length;
-    char buffer[24];
-    uint8_t length;
-    
-    length = strlen(SERVER_FULL_MSG);
-    total_length = sprintf(buffer, "%c%c%s", (uint8_t)SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE, length, SERVER_FULL_MSG);
-    send(client_sockfd, buffer, total_length, 0);
-
-    connected_clients--;
-    close(client_sockfd);
-}
 
 void *handle_clients(void *arg)
 {
     int client_temp_sockfd;
     void *client_sockfd;
     pthread_t client_thread;
+    char buffer[24];
+    uint8_t total_length;
     int listener;
 
     pthread_detach(pthread_self());
-
+    total_length = sprintf(buffer, "%c%c%21s", (uint8_t)SEND_SERVER_MESSAGE_IN_ROOM_RESPONSE, 21, SERVER_FULL_MSG);
+    
     listener = *(int *)arg;
     while (true)
     {
@@ -46,7 +37,9 @@ void *handle_clients(void *arg)
         *(int *)client_sockfd = client_temp_sockfd;
         if (connected_clients > NUM_OF_CONNECTIONS)
         {
-            server_end_client_connection(client_temp_sockfd);
+            send(client_temp_sockfd, buffer, total_length, 0);
+            connected_clients--;
+            close(client_temp_sockfd);
         }
         else
         {
